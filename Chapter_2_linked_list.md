@@ -116,8 +116,8 @@ rear = p; // 将 rear 更新为 p
 using namespace std;
 
 struct Node {
-  	string name;
-  	Node* next;
+    string name;
+    Node* next;
     Node() {}
     Node(string s) : name(s), next(NULL) {}
 };
