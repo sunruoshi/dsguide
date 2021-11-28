@@ -63,8 +63,8 @@
 ```cpp
 #include <string>
 struct Node {
-  	string name;  // 数据域，用于保存数据的原始值
-  	Node* next;   // 指针域，保存下一个成员的内存地址
+    string name;  // 数据域，用于保存数据的原始值
+    Node* next;   // 指针域，保存下一个成员的内存地址
     Node() {}     // 默认构造函数，用于构造 head 节点
     Node(string s) : name(s), next(NULL) {}
 };
@@ -347,8 +347,8 @@ Elizabeth
 ```cpp
 // ...
 struct Node {
-  	string name;
-  	Node *prev, *next;
+    string name;
+    Node *prev, *next;
     Node() {}
     Node(string s) : name(s), prev(NULL), next(NULL) {}
 };
