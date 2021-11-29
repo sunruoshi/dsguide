@@ -28,10 +28,10 @@
 
 不仅如此，根据 $$BST$$ 的性质，我们可以很容易找到树中的这样几个值：
 
-1. $$max$$：树中值最大的节点。
-2. $$min$$ ：树中值最小的节点。
-3. 节点 $$x$$ 的「前驱」：树中值比节点 $$x$$ 小的最大节点。
-4. 节点 $$x$$ 的「后继」：树中值比节点 $$x$$ 大的最小节点。
+1. $$max$$：树中的最大值。
+2. $$min$$ ：树中的最小值。
+3. 值 $$x$$ 的「前驱」：树中比 $$x$$ 小的最大值。
+4. 值 $$x$$ 的「后继」：树中比 $$x$$ 大的最小值。
 
 这对于解决我们上一章中提到的那个问题非常方便：如果想要找到树中「第二大」的节点，那么就只需要找到 $$max$$ 的「前驱」就好了。
 
@@ -163,4 +163,199 @@ Min Age: 10 Name: Elizabeth
 
 ### 4.2.3 找前驱/后继
 
-之前提到过，$$BST$$ 中，节点 $$x$$ 的前驱节点 $$prev(x)$$ 的定义是「比 $$x$$ 小的最大节点」，后继节点 $$next(x)$$ 的定义是「比 $$x$$ 大的最小节点」。
+之前提到过，$$BST$$ 中，$$x$$ 的前驱 $$prev(x)$$ 的定义是「比 $$x$$ 小的最大值」，后继 $$next(x)$$ 的定义是「比 $$x$$ 大的最小值」。
+
+如果想要找到 $$prev(x)$$ ，过程如下：
+
+从根节点 $$root$$ 开始往下找：
+
+- 如果 $$x$$ 大于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在右子树，则返回 $$cur$$ ；
+  - 否则则向右子树递归，返回一个结果 $$res$$ ；
+    - 如果 $$res == NULL$$ ，则还是返回 $$cur$$ ；
+    - 否则返回 $$res$$ 。
+- 如果 $$x$$ 小于等于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在左子树，则返回 $$NULL$$ ；
+  - 否则，则向左子树递归求解。
+
+```cpp
+// ...
+Node* findPrev(Node* cur, int x) {
+    if (x > cur->age) {
+        if (cur->R == NULL) return cur;
+        Node* res = findPrev(cur->R, x);
+        if (res == NULL) return cur;
+        return res;
+    } else {
+        if (cur->L == NULL) return NULL;
+        else return findPrev(cur->L, x);
+    }
+}
+```
+
+下面测试一下，找到 $$A$$ 班学生中年龄「第二大」的。
+
+首先找到所有学生中最大的年龄 $$maxAge$$ ：
+
+```cpp
+// ...
+int maxAge = findMax(root)->age;
+```
+
+年龄「第二大」的，显然就是 $$maxAge$$ 的前驱：
+
+```cpp
+Node* pre = findPrev(root, maxAge);
+cout << "Second greatest Age: " << pre->age << ' ' << "Name: " << pre->name << endl;
+```
+
+运行之后可以看到输出如下：
+
+```
+Second greatest Age: 15 Name: Bob
+```
+
+年龄第二大的人是 $$Bob$$ ，年龄为 $$15$$ 。
+
+查找 $$next(x)$$ 的原理是类似的，过程如下：
+
+从根节点 $$root$$ 开始往下找：
+
+- 如果 $$x$$ 小于等于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在左子树，则返回 $$cur$$ ；
+  - 否则则向左子树递归，返回一个结果 $$res$$ ；
+    - 如果 $$res == NULL$$ ，则还是返回 $$cur$$ ；
+    - 否则返回 $$res$$ 。
+- 如果 $$x$$ 大于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在右子树，则返回 $$NULL$$ ；
+  - 否则，则向右子树递归求解。
+
+代码实现如下：
+
+```cpp
+// ...
+Node* findNext(Node* cur, int x) {
+    if (x <= cur->age) {
+        if (cur->L == NULL) return cur;
+        Node* res = findPrev(cur->L, x);
+        if (res == NULL) return cur;
+        return res;
+    } else {
+        if (cur->R == NULL) return NULL;
+        else return findPrev(cur->R, x);
+    }
+}
+```
+
+同样，我们来尝试找出 $$A$$ 班中年龄「第二小」的。
+
+首先找到所有学生中的最小年龄 $$minAge$$ ：
+
+```cpp
+// ...
+int minAge = findMin(root)->age;
+```
+
+年龄「第二小」的，显然就是 $$minAge$$ 的后继：
+
+```cpp
+Node* nex = findNext(root, minAge);
+cout << "Second least Age: " << nex->age << ' ' << "Name: " << nex->name << endl;
+```
+
+运行之后可以看到输出如下：
+
+```
+Second least Age: 13 Name: Alice
+```
+
+年龄第二小的人是 $$Alice$$ ，年龄为 $$13$$ 。
+
+### 4.2.4 删除 $$BST$$ 中的节点
+
+$$BST$$ 删除节点的操作就有些复杂了。因为和插入的时候一样，我们要保证 $$BST$$ 在删除了一个节点之后「仍然是一棵 $$BST$$」。
+
+为了保证这一点，在 $$BST$$ 中删除节点 $$x$$ 通常有两种方法：
+
+1. 找到 $$x$$ 的「前驱节点」$$prev(x)$$ ，用 $$prev(x)$$ 覆盖掉 $$x$$ ，然后删除 $$prev(x)$$ ；
+2. 找到 $$x$$ 的「后继节点」$$next(x)$$ ，用 $$next(x)$$ 覆盖掉 $$x$$ ，然后删除 $$next(x)$$ ；
+
+以上操作可能需要「递归」进行。如果递归到了一个「叶子节点」，那么就可以直接删除这个节点，因为删除「叶子节点」不会对其他节点造成影响了。
+
+这两种做法都可以保证删除操作之后仍然是一棵 $$BST$$ 。
+
+一种不太好但是可行的代码实现如下：
+
+```cpp
+// ...
+void deleteNode(Node* &cur, Node* x) {
+    if (cur == NULL) return;             // 如果节点不存在直接返回
+    if (cur == x) {                      // 如果找到了节点 x
+        if (cur->L == NULL && cur->R == NULL) {
+            cur = NULL;                  // 如果是叶子节点就直接删除
+        } else if (cur->L != NULL) {     // 如果有左子树
+            Node* pre = findMax(cur->L); // 找到左子树中最大的节点，即前驱
+            cur->name = pre->name;       // 用 pre 覆盖掉 cur
+            cur->age = pre->age;
+            deleteNode(cur->L, pre);     // 递归的在左子树中继续删除 pre
+        } else if (cur->R != NULL) {     // 如果有右子树
+            Node* nex = findMin(cur->R); // 找到右子树中的最小节点，即后继
+            cur->name = nex->name;       // 用 nex 覆盖掉 cur
+            cur->age = nex->age;
+            deleteNode(cur->R, nex);     // 递归的在右子树中继续删除 nex
+        }
+    } else if (x->age <= cur->age) {
+        deleteNode(cur->L, x);
+    } else if (x->age > cur->age) {
+        deleteNode(cur->R, x);
+    }
+}
+```
+
+当然，要删除节点 $$x$$ ，首先要找到节点 $$x$$ 。所以我们可以定义一个在 $$BST$$ 中查找节点的 $$findNode()$$ 方法。
+
+对于当前的例子，我们希望通过姓名来查找相应的同学。由于 $$BST$$ 是按照「年龄」来构建，所以我们并不能根据姓名来判断该往左子树查找还是右子树查找，在这种情况下，就对左右子树都进行查找：
+
+```cpp
+// ...
+Node* findNode(Node* cur, string s) {
+    if (cur == NULL) return NULL;
+    if (cur->name == s) return cur;
+	Node* res = findNode(cur->L, s);
+    if (res == NULL) return findNode(cur->R, s);
+    else return res;
+}
+```
+
+现在我们尝试删除掉 $$Bob$$ ，之后再中序遍历 $$BST$$ ：
+
+```cpp
+// ...
+Node* x = findNode(root, "Bob");
+deleteNode(root, x);
+inOrder(root);
+```
+
+可以看到输出如下：
+
+```
+Age: 10 Name: Elizabeth
+Age: 11 Name: Celine
+Age: 13 Name: Alice
+Age: 16 Name: David
+```
+
+$$Bob$$ 被成功的删除了，而 $$BST$$ 的性质依然得以保留。
+
+以上代码主要是用来体现删除操作的思路，实际使用中，以上代码可以通过很多手段优化。
+
+例如可以在找到 $$x$$ 的后继 $$next(x)$$ 之后，不进行递归，而是通过这样的手段直接删除该后继：
+
+>  假设后继 $$next(x)$$ 的父节点是 $$F$$ ，则显然 $$next(x)$$ 是 $$F$$ 的左儿子。那么由于 $$next(x)$$ 「一定没有左子树」，便可以直接把 $$next(x)$$ 的右子树代替 $$next(x)$$ 成为 $$F$$ 的左子树，这样就删去了节点 $$next(x)$$ 。前驱同理。
+
+为了方便操作，这需要在 $$BST$$ 的节点定义中增加一个指针域，指向父节点的地址。
+
+但是有一点需要注意，总是优先删除前驱（或后继）容易导致 $$BST$$ 的左右子树高度极度不平衡，使得 $$BST$$ 退化成一条链，这样会大大降低 $$BST$$ 的性能。在之后的内容中我们会继续讨论这个问题。
+
+## 4.3 二叉搜索树的性能
+
