@@ -10,7 +10,7 @@ $$size$$ 域在 $$BST$$ 中最经典的一个应用就是求解节点 $$x$$ 的�
 
 沿用第四章中的例子：
 
-$$A$$ 班所有学生的名字已经保存在了一棵 $$BST$$ 中，即 $$A$$ 班的花名册现在已经按照名字的字典序生序的建好了。现在我们想要知道 $$David$$ 是花名册中的第几个人。
+$$A$$ 班所有学生的名字已经保存在了一棵 $$BST$$ 中，即 $$A$$ 班的花名册现在已经按照名字的字典序升序建好了。现在我们想要知道 $$David$$ 是花名册中的第几个人。
 
 这个问题实际上就是要求解 $$David$$ 在 $$BST$$ 中的排名。
 
@@ -91,14 +91,14 @@ void deleteNode(Node* &cur, string x) {
 
 ```cpp
 int getRank(Node* cur, string x) {
-    if (cur->L == NULL && cur->R == NULL) return 1;
-    if (cur->L != NULL && x < cur->name) return getRank(cur->L, x);
-    if (cur->R != NULL && x > cur->name) return getRank(cur->R, x) + cur->L->size + 1;
+    if (!cur->L && !cur->R) return 1;
+    if (cur->L && x < cur->name) return getRank(cur->L, x);
+    if (cur->R && x > cur->name) return getRank(cur->R, x) + cur->L->size + 1;
     return cur->L->size + 1;
 }
 ```
 
-如果用第四章的样例来测试，可以打印出所有学生的排名如下：
+如果使用第四章的例子来测试，可以打印出所有学生的排名如下：
 
 ```
 Harris Rank: 8
