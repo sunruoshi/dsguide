@@ -340,11 +340,11 @@ void deleteNode(Node* &cur, string x) {
             cur = NULL;
         } else if (cur->L != NULL) {
             string pred = findMax(cur->L)->name; // 找到左子树中最大的节点，即前驱
-            cur->name = pred;                    // 用 pre 覆盖掉 cur
+            cur->name = pred;                    // 用 pred 覆盖掉 cur
             deleteNode(cur->L, pred);            // 在左子树中继续删除 pred
         } else if (cur->R != NULL) {
             string succ = findMin(cur->R)->name; // 找到右子树中的最小节点，即后继
-            cur->name = succ;                    // 用 nex 覆盖掉 cur
+            cur->name = succ;                    // 用 succ 覆盖掉 cur
             deleteNode(cur->R, succ);            // 在右子树中继续删除 succ
         }
     } else if (x < cur->name) {
