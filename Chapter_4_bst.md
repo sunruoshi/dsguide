@@ -334,18 +334,18 @@ $$BST$$ 删除节点的操作就有些复杂了。因为和插入的时候一样
 ```cpp
 // ...
 void deleteNode(Node* &cur, string x) {
-    if (cur == NULL) return;                    // 如果节点不存在直接返回
-    if (x == cur->name) {                       // 如果找到了节点 x
-        if (cur->L == NULL && cur->R == NULL) {
-            cur = NULL;                         // 如果是叶子节点就直接删除
-        } else if (cur->L != NULL) {            // 如果有左子树
+    if (cur == NULL) return;
+    if (x == cur->name) {
+        if (cur->L == NULL && cur->R == NULL) {  // 叶子节点直接删除
+            cur = NULL;
+        } else if (cur->L != NULL) {
             string pred = findMax(cur->L)->name; // 找到左子树中最大的节点，即前驱
             cur->name = pred;                    // 用 pre 覆盖掉 cur
-            deleteNode(cur->L, pred);            // 递归的在左子树中继续删除 pre
-        } else if (cur->R != NULL) {            // 如果有右子树
+            deleteNode(cur->L, pred);            // 在左子树中继续删除 pred
+        } else if (cur->R != NULL) {
             string succ = findMin(cur->R)->name; // 找到右子树中的最小节点，即后继
             cur->name = succ;                    // 用 nex 覆盖掉 cur
-            deleteNode(cur->R, succ);            // 递归的在右子树中继续删除 nex
+            deleteNode(cur->R, succ);            // 在右子树中继续删除 succ
         }
     } else if (x < cur->name) {
         deleteNode(cur->L, x);
@@ -396,4 +396,4 @@ $$Bob$$ 被成功的删除了，而 $$BST$$ 的性质依然得以保留。
 
 那么接下来，我们自然就想要 $$BST$$ 能够动态的调整自己的高度，使得内部节点的排列尽量的接近完全二叉树。
 
-这种能够自行调整高度的二叉搜索树，叫做「平衡树」。
+这种能够自动调整高度的二叉搜索树，叫做「平衡树」。
