@@ -33,7 +33,7 @@
 3. 值 $$x$$ 的「前驱」：树中比 $$x$$ 小的最大值。
 4. 值 $$x$$ 的「后继」：树中比 $$x$$ 大的最小值。
 
-这对于解决我们上一章中提到的那个问题非常方便：如果想要找到树中「第二大」的节点，那么就只需要找到 $$max$$ 的「前驱」就好了。
+这对于解决我们上一章中提到的那个问题非常方便：如果想要找到所有学生中名字的字典序「第二大」的，那么就只需要找到名字字典序最大的学生的「前驱」就好了。
 
 下面我们来讨论如何构造一棵 $$BST$$ ，并将数据存放到 $$BST$$ 中。
 
@@ -46,14 +46,23 @@
 ```cpp
 #include <string>
 
-const string names[5] = {"Alice", "Bob", "Celine", "David", "Elizabeth"};
-const int ages[5] = {13, 15, 11, 16, 10};
+const string names[10] = {
+    "Harris",
+    "Ford",
+    "Celine",
+    "Jack",
+    "Elizabeth",
+    "Bob",
+    "Gary",
+    "Alice",
+    "Isabelle",
+    "David",
+};
 
 struct Node {
-    string name; // 数据域一：学生的名字
-    int age;     // 数据域二：学生的年龄
+    string name; // 数据域：学生的名字
     Node *L, *R; // 指针域，分别指向左儿子和右儿子，初始值都为 NULL
-    Node(string s, int d) : name(s), age(d), L(NULL), R(NULL) {}
+    Node(string s) : name(s), L(NULL), R(NULL) {}
 };
 ```
 
@@ -61,7 +70,7 @@ struct Node {
 
 ```cpp
 // ...
-Node* root = new Node(names[0], ages[0]);
+Node* root = new Node(names[0]);
 ```
 
 那么现在我们就需要一个 $$insert()$$ 方法，可以将后续的成员都一一插入到 $$BST$$ 中。
@@ -74,13 +83,13 @@ Node* root = new Node(names[0], ages[0]);
 
 ```cpp
 // ...
-Node* insert(Node* &cur, string name, int age) {
+Node* insert(Node* &cur, string name) {
     if (cur == NULL) {
-        cur = new Node(name, age);
+        cur = new Node(name);
         return cur;
     }
-    if (age <= cur->age) return insert(cur->L, name, age);
-    else return insert(cur->R, name, age);
+    if (name <= cur->name) return insert(cur->L, name);
+    else return insert(cur->R, name);
 }
 ```
 
@@ -99,12 +108,12 @@ $$insert()$$ 方法的逻辑非常符合直觉：
 void inOrder(Node* cur) {
     if (cur == NULL) return;
     inOrder(cur->L);
-    cout << "Age: " << cur->age << ' ' << "Name: " << cur->name << endl;
+    cout << "Name: " << cur->name << endl;
     inOrder(cur->R);
 }
 // ...
-for (int i = 1; i < 5; i++) {
-    insert(root, names[i], ages[i]);
+for (int i = 1; i < 10; i++) {
+    insert(root, names[i]);
 }
 inOrder(root);
 ```
@@ -112,14 +121,19 @@ inOrder(root);
 运行以上代码可以看到以下输出：
 
 ```
-Age: 10 Name: Elizabeth
-Age: 11 Name: Celine
-Age: 13 Name: Alice
-Age: 15 Name: Bob
-Age: 16 Name: David
+Name: Alice
+Name: Bob
+Name: Celine
+Name: David
+Name: Elizabeth
+Name: Ford
+Name: Gary
+Name: Harris
+Name: Isabelle
+Name: Jack
 ```
 
-所有学生已经按照年龄升序排列了！
+所有学生已经按照名字的字典序升序排列了！
 
 下面我们来一一实现之前提到的四种操作。
 
@@ -148,18 +162,18 @@ Node* findMin(Node* cur) {
 // ...
 Node* Max = findMax(root);
 Node* Min = findMin(root);
-cout << "Max Age: " << Max->age << ' ' << "Name: " << Max->name << endl;
-cout << "Min Age: " << Min->age << ' ' << "Name: " << Min->name << endl;
+cout << "Max: " << Max->name << endl;
+cout << "Min: " << Min->name << endl;
 ```
 
 可以看到输出如下：
 
 ```
-Max Age: 16 Name: David
-Min Age: 10 Name: Elizabeth
+Max: Jack
+Min: Alice
 ```
 
-很容易就找到了年龄最大和最小的同学。
+很容易就找到了名字的字典序最大和最小的同学。
 
 ### 4.2.3 找前驱/后继
 
@@ -180,8 +194,8 @@ Min Age: 10 Name: Elizabeth
 
 ```cpp
 // ...
-Node* findPrev(Node* cur, int x) {
-    if (x > cur->age) {
+Node* findPrev(Node* cur, string x) {
+    if (x > cur->name) {
         if (cur->R == NULL) return cur;
         Node* res = findPrev(cur->R, x);
         if (res == NULL) return cur;
@@ -193,35 +207,35 @@ Node* findPrev(Node* cur, int x) {
 }
 ```
 
-下面测试一下，找到 $$A$$ 班学生中年龄「第二大」的。
+下面测试一下，找到 $$A$$ 班学生中，名字的字典序「第二大」的。
 
-首先找到所有学生中最大的年龄 $$maxAge$$ ：
+首先找到所有学生中字典序最大的名字 $$maxName$$ ：
 
 ```cpp
 // ...
-int maxAge = findMax(root)->age;
+string maxName = findMax(root)->name;
 ```
 
-年龄「第二大」的，显然就是 $$maxAge$$ 的前驱：
+字典序「第二大」的，显然就是 $$maxName$$ 的前驱：
 
 ```cpp
-Node* pre = findPrev(root, maxAge);
-cout << "Second greatest Age: " << pre->age << ' ' << "Name: " << pre->name << endl;
+Node* pre = findPrev(root, maxName);
+cout << "Second greatest name: " << pre->name << endl;
 ```
 
 运行之后可以看到输出如下：
 
 ```
-Second greatest Age: 15 Name: Bob
+Second greatest name: Isabelle
 ```
 
-年龄第二大的人是 $$Bob$$ ，年龄为 $$15$$ 。
+名字的字典序第二大的人是 $$Isabelle$$ 。
 
 查找 $$next(x)$$ 的原理是类似的，过程如下：
 
 从根节点 $$root$$ 开始往下找：
 
-- 如果 $$x$$ 小于等于当前节点 $$cur$$ 的数据域，那么则需要判断：
+- 如果 $$x$$ 小于当前节点 $$cur$$ 的数据域，那么则需要判断：
   - 如果 $$cur$$ 不存在左子树，则返回 $$cur$$ ；
   - 否则则向左子树递归，返回一个结果 $$res$$ ；
     - 如果 $$res == NULL$$ ，则还是返回 $$cur$$ ；
@@ -234,42 +248,42 @@ Second greatest Age: 15 Name: Bob
 
 ```cpp
 // ...
-Node* findNext(Node* cur, int x) {
-    if (x <= cur->age) {
+Node* findNext(Node* cur, string x) {
+    if (x < cur->name) {
         if (cur->L == NULL) return cur;
-        Node* res = findPrev(cur->L, x);
+        Node* res = findNext(cur->L, x);
         if (res == NULL) return cur;
         return res;
     } else {
         if (cur->R == NULL) return NULL;
-        else return findPrev(cur->R, x);
+        else return findNext(cur->R, x);
     }
 }
 ```
 
-同样，我们来尝试找出 $$A$$ 班中年龄「第二小」的。
+同样，我们来尝试找出 $$A$$ 班中名字的字典序「第二小」的。
 
-首先找到所有学生中的最小年龄 $$minAge$$ ：
+首先找到所有学生中的字典序最小的名字 $$minName$$ ：
 
 ```cpp
 // ...
-int minAge = findMin(root)->age;
+string minName = findMin(root)->name;
 ```
 
-年龄「第二小」的，显然就是 $$minAge$$ 的后继：
+名字的字典序「第二小」的，显然就是 $$minName$$ 的后继：
 
 ```cpp
-Node* nex = findNext(root, minAge);
-cout << "Second least Age: " << nex->age << ' ' << "Name: " << nex->name << endl;
+Node* nex = findNext(root, minName);
+cout << "Second least name: " << nex->name << endl;
 ```
 
 运行之后可以看到输出如下：
 
 ```
-Second least Age: 13 Name: Alice
+Second least name: Bob
 ```
 
-年龄第二小的人是 $$Alice$$ ，年龄为 $$13$$ 。
+名字的字典序第二小的人是 $$Bob$$ 。
 
 ### 4.2.4 删除 $$BST$$ 中的节点
 
@@ -288,42 +302,25 @@ $$BST$$ 删除节点的操作就有些复杂了。因为和插入的时候一样
 
 ```cpp
 // ...
-void deleteNode(Node* &cur, Node* x) {
-    if (cur == NULL) return;             // 如果节点不存在直接返回
-    if (cur == x) {                      // 如果找到了节点 x
+void deleteNode(Node* &cur, string x) {
+    if (cur == NULL) return;                    // 如果节点不存在直接返回
+    if (x == cur->name) {                       // 如果找到了节点 x
         if (cur->L == NULL && cur->R == NULL) {
-            cur = NULL;                  // 如果是叶子节点就直接删除
-        } else if (cur->L != NULL) {     // 如果有左子树
-            Node* pre = findMax(cur->L); // 找到左子树中最大的节点，即前驱
-            cur->name = pre->name;       // 用 pre 覆盖掉 cur
-            cur->age = pre->age;
-            deleteNode(cur->L, pre);     // 递归的在左子树中继续删除 pre
-        } else if (cur->R != NULL) {     // 如果有右子树
-            Node* nex = findMin(cur->R); // 找到右子树中的最小节点，即后继
-            cur->name = nex->name;       // 用 nex 覆盖掉 cur
-            cur->age = nex->age;
-            deleteNode(cur->R, nex);     // 递归的在右子树中继续删除 nex
+            cur = NULL;                         // 如果是叶子节点就直接删除
+        } else if (cur->L != NULL) {            // 如果有左子树
+            string pre = findMax(cur->L)->name; // 找到左子树中最大的节点，即前驱
+            cur->name = pre;                    // 用 pre 覆盖掉 cur
+            deleteNode(cur->L, pre);            // 递归的在左子树中继续删除 pre
+        } else if (cur->R != NULL) {            // 如果有右子树
+            string nex = findMin(cur->R)->name; // 找到右子树中的最小节点，即后继
+            cur->name = nex;                    // 用 nex 覆盖掉 cur
+            deleteNode(cur->R, nex);            // 递归的在右子树中继续删除 nex
         }
-    } else if (x->age <= cur->age) {
+    } else if (x < cur->name) {
         deleteNode(cur->L, x);
-    } else if (x->age > cur->age) {
+    } else if (x > cur->name) {
         deleteNode(cur->R, x);
     }
-}
-```
-
-当然，要删除节点 $$x$$ ，首先要找到节点 $$x$$ 。所以我们可以定义一个在 $$BST$$ 中查找节点的 $$findNode()$$ 方法。
-
-对于当前的例子，我们希望通过姓名来查找相应的同学。由于 $$BST$$ 是按照「年龄」来构建，所以我们并不能根据姓名来判断该往左子树查找还是右子树查找，在这种情况下，就对左右子树都进行查找：
-
-```cpp
-// ...
-Node* findNode(Node* cur, string s) {
-    if (cur == NULL) return NULL;
-    if (cur->name == s) return cur;
-    Node* res = findNode(cur->L, s);
-    if (res == NULL) return findNode(cur->R, s);
-    else return res;
 }
 ```
 
@@ -331,18 +328,22 @@ Node* findNode(Node* cur, string s) {
 
 ```cpp
 // ...
-Node* x = findNode(root, "Bob");
-deleteNode(root, x);
+deleteNode(root, "Bob");
 inOrder(root);
 ```
 
 可以看到输出如下：
 
 ```
-Age: 10 Name: Elizabeth
-Age: 11 Name: Celine
-Age: 13 Name: Alice
-Age: 16 Name: David
+Name: Alice
+Name: Celine
+Name: David
+Name: Elizabeth
+Name: Ford
+Name: Gary
+Name: Harris
+Name: Isabelle
+Name: Jack
 ```
 
 $$Bob$$ 被成功的删除了，而 $$BST$$ 的性质依然得以保留。
