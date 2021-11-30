@@ -30,8 +30,8 @@
 
 1. $$max$$：树中的最大值。
 2. $$min$$ ：树中的最小值。
-3. 值 $$x$$ 的「前驱」：树中比 $$x$$ 小的最大值。
-4. 值 $$x$$ 的「后继」：树中比 $$x$$ 大的最小值。
+3. 值 $$x$$ 的前驱（$$Predecessor$$）：树中比 $$x$$ 小的最大值。
+4. 值 $$x$$ 的后继（$$Successor$$）：树中比 $$x$$ 大的最小值。
 
 这对于解决我们上一章中提到的那个问题非常方便：如果想要找到所有学生中名字的字典序「第二大」的，那么就只需要找到名字字典序最大的学生的「前驱」就好了。
 
@@ -177,9 +177,36 @@ Min: Alice
 
 ### 4.2.3 找前驱/后继
 
-之前提到过，$$BST$$ 中，$$x$$ 的前驱 $$prev(x)$$ 的定义是「比 $$x$$ 小的最大值」，后继 $$next(x)$$ 的定义是「比 $$x$$ 大的最小值」。
+之前提到过，$$BST$$ 中，$$x$$ 的前驱 $$pred(x)$$ 的定义是「比 $$x$$ 小的最大值」，后继 $$succ(x)$$ 的定义是「比 $$x$$ 大的最小值」。
 
-如果想要找到 $$prev(x)$$ ，过程如下：
+也可以这样理解：
+
+- $$pred(x)$$ 是 $$BST$$ 的中序遍历序列中 $$x$$ 的上一个值。
+- $$succ(x)$$ 是 $$BST$$ 的中序遍历序列中 $$x$$ 的下一个值。
+
+从 $$BST$$ 的性质可知：$$pred(x)$$ 就是 $$x$$ 的左子树中最大的节点，即「左子树中最右边的节点」，$$succ(x)$$ 就是 $$x$$ 的右子树中最小的节点，即「右子树中最左边的节点」。
+
+通过这种思想，可以很简单的实现 $$findPred()$$ 和 $$findSucc()$$ 方法：
+
+```cpp
+Node* findPred(Node* x) { // 找 x 的左子树中最右边的节点
+    x = x->L;
+    while (x->R != NULL) x = x->R;
+    return x;
+}
+
+Node* findSucc(Node* x) { // 找 x 的右子树中最左边的节点
+    x = x->R;
+    while (x->L != NULL) x = x->L;
+    return x;
+}
+```
+
+由于这里的 $$x$$ 是一个结构体指针，即节点本身，所以在此之前需要先使用 $$findNode()$$ 方法找到 $$x$$ 的位置。但是有些时候我们想直接查找「值」。
+
+下面给出一种直接查找「值」的实现（省去查找节点的过程）：
+
+如果想要找到 $$pred(x)$$ ，过程如下：
 
 从根节点 $$root$$ 开始往下找：
 
@@ -194,15 +221,15 @@ Min: Alice
 
 ```cpp
 // ...
-Node* findPrev(Node* cur, string x) {
+Node* findPred(Node* cur, string x) {
     if (x > cur->name) {
         if (cur->R == NULL) return cur;
-        Node* res = findPrev(cur->R, x);
+        Node* res = findPred(cur->R, x);
         if (res == NULL) return cur;
         return res;
     } else {
         if (cur->L == NULL) return NULL;
-        else return findPrev(cur->L, x);
+        else return findPred(cur->L, x);
     }
 }
 ```
@@ -219,8 +246,8 @@ string maxName = findMax(root)->name;
 字典序「第二大」的，显然就是 $$maxName$$ 的前驱：
 
 ```cpp
-Node* pre = findPrev(root, maxName);
-cout << "Second greatest name: " << pre->name << endl;
+Node* pred = findPred(root, maxName);
+cout << "Second greatest name: " << pred->name << endl;
 ```
 
 运行之后可以看到输出如下：
@@ -231,7 +258,7 @@ Second greatest name: Isabelle
 
 名字的字典序第二大的人是 $$Isabelle$$ 。
 
-查找 $$next(x)$$ 的原理是类似的，过程如下：
+查找 $$succ(x)$$ 的原理是类似的，过程如下：
 
 从根节点 $$root$$ 开始往下找：
 
@@ -248,15 +275,15 @@ Second greatest name: Isabelle
 
 ```cpp
 // ...
-Node* findNext(Node* cur, string x) {
+Node* findSucc(Node* cur, string x) {
     if (x < cur->name) {
         if (cur->L == NULL) return cur;
-        Node* res = findNext(cur->L, x);
+        Node* res = findSucc(cur->L, x);
         if (res == NULL) return cur;
         return res;
     } else {
         if (cur->R == NULL) return NULL;
-        else return findNext(cur->R, x);
+        else return findSucc(cur->R, x);
     }
 }
 ```
@@ -273,8 +300,8 @@ string minName = findMin(root)->name;
 名字的字典序「第二小」的，显然就是 $$minName$$ 的后继：
 
 ```cpp
-Node* nex = findNext(root, minName);
-cout << "Second least name: " << nex->name << endl;
+Node* succ = findSucc(root, minName);
+cout << "Second least name: " << succ->name << endl;
 ```
 
 运行之后可以看到输出如下：
@@ -291,14 +318,14 @@ $$BST$$ 删除节点的操作就有些复杂了。因为和插入的时候一样
 
 为了保证这一点，在 $$BST$$ 中删除节点 $$x$$ 通常有两种方法：
 
-1. 找到 $$x$$ 的「前驱节点」$$prev(x)$$ ，用 $$prev(x)$$ 覆盖掉 $$x$$ ，然后删除 $$prev(x)$$ ；
-2. 找到 $$x$$ 的「后继节点」$$next(x)$$ ，用 $$next(x)$$ 覆盖掉 $$x$$ ，然后删除 $$next(x)$$ ；
+1. 找到 $$x$$ 的「前驱节点」$$pred(x)$$ ，用 $$pred(x)$$ 覆盖掉 $$x$$ ，然后删除 $$pred(x)$$ ；
+2. 找到 $$x$$ 的「后继节点」$$succ(x)$$ ，用 $$succ(x)$$ 覆盖掉 $$x$$ ，然后删除 $$succ(x)$$ ；
 
 以上操作可能需要「递归」进行。如果递归到了一个「叶子节点」，那么就可以直接删除这个节点，因为删除「叶子节点」不会对其他节点造成影响了。
 
 这两种做法都可以保证删除操作之后仍然是一棵 $$BST$$ 。
 
-一种不太好但是可行的代码实现如下：
+一种可行的代码实现如下：
 
 ```cpp
 // ...
@@ -308,13 +335,13 @@ void deleteNode(Node* &cur, string x) {
         if (cur->L == NULL && cur->R == NULL) {
             cur = NULL;                         // 如果是叶子节点就直接删除
         } else if (cur->L != NULL) {            // 如果有左子树
-            string pre = findMax(cur->L)->name; // 找到左子树中最大的节点，即前驱
-            cur->name = pre;                    // 用 pre 覆盖掉 cur
-            deleteNode(cur->L, pre);            // 递归的在左子树中继续删除 pre
+            string pred = findMax(cur->L)->name; // 找到左子树中最大的节点，即前驱
+            cur->name = pred;                    // 用 pre 覆盖掉 cur
+            deleteNode(cur->L, pred);            // 递归的在左子树中继续删除 pre
         } else if (cur->R != NULL) {            // 如果有右子树
-            string nex = findMin(cur->R)->name; // 找到右子树中的最小节点，即后继
-            cur->name = nex;                    // 用 nex 覆盖掉 cur
-            deleteNode(cur->R, nex);            // 递归的在右子树中继续删除 nex
+            string succ = findMin(cur->R)->name; // 找到右子树中的最小节点，即后继
+            cur->name = succ;                    // 用 nex 覆盖掉 cur
+            deleteNode(cur->R, succ);            // 递归的在右子树中继续删除 nex
         }
     } else if (x < cur->name) {
         deleteNode(cur->L, x);
