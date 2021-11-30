@@ -5,4 +5,4 @@
 * [Chapter II：链表篇](Chapter\_2\_linked\_list.md)
 * [Chapter III：二叉堆篇](Chapter\_3\_heap.md)
 * [Chapter IV：二叉搜索树篇](Chapter\_4\_bst.md)
-* [Extra I：BST中其它有用的域](Extra\_1\.md)
+* [Extra I：二叉搜索树的一些有用的域](Extra\_1\.md)
