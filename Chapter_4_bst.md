@@ -219,6 +219,8 @@ Node* findSucc(Node* x) { // 找 x 的右子树中最左边的节点
   - 如果 $$cur$$ 不存在左子树，则返回 $$NULL$$ ；
   - 否则，则向左子树递归求解。
 
+一种代码实现如下：
+
 ```cpp
 // ...
 Node* findPred(Node* cur, string x) {
@@ -233,6 +235,38 @@ Node* findPred(Node* cur, string x) {
     }
 }
 ```
+
+查找 $$succ(x)$$ 的原理是类似的，过程如下：
+
+从根节点 $$root$$ 开始往下找：
+
+- 如果 $$x$$ 小于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在左子树，则返回 $$cur$$ ；
+  - 否则则向左子树递归，返回一个结果 $$res$$ ；
+    - 如果 $$res == NULL$$ ，则还是返回 $$cur$$ ；
+    - 否则返回 $$res$$ 。
+- 如果 $$x$$ 大于当前节点 $$cur$$ 的数据域，那么则需要判断：
+  - 如果 $$cur$$ 不存在右子树，则返回 $$NULL$$ ；
+  - 否则，则向右子树递归求解。
+
+一种代码实现如下：
+
+```cpp
+// ...
+Node* findSucc(Node* cur, string x) {
+    if (x < cur->name) {
+        if (cur->L == NULL) return cur;
+        Node* res = findSucc(cur->L, x);
+        if (res == NULL) return cur;
+        return res;
+    } else {
+        if (cur->R == NULL) return NULL;
+        else return findSucc(cur->R, x);
+    }
+}
+```
+
+以上两种实现方式可以根据不同的应用场景灵活的选用。
 
 下面测试一下，找到 $$A$$ 班学生中，名字的字典序「第二大」的。
 
@@ -257,36 +291,6 @@ Second greatest name: Isabelle
 ```
 
 名字的字典序第二大的人是 $$Isabelle$$ 。
-
-查找 $$succ(x)$$ 的原理是类似的，过程如下：
-
-从根节点 $$root$$ 开始往下找：
-
-- 如果 $$x$$ 小于当前节点 $$cur$$ 的数据域，那么则需要判断：
-  - 如果 $$cur$$ 不存在左子树，则返回 $$cur$$ ；
-  - 否则则向左子树递归，返回一个结果 $$res$$ ；
-    - 如果 $$res == NULL$$ ，则还是返回 $$cur$$ ；
-    - 否则返回 $$res$$ 。
-- 如果 $$x$$ 大于当前节点 $$cur$$ 的数据域，那么则需要判断：
-  - 如果 $$cur$$ 不存在右子树，则返回 $$NULL$$ ；
-  - 否则，则向右子树递归求解。
-
-代码实现如下：
-
-```cpp
-// ...
-Node* findSucc(Node* cur, string x) {
-    if (x < cur->name) {
-        if (cur->L == NULL) return cur;
-        Node* res = findSucc(cur->L, x);
-        if (res == NULL) return cur;
-        return res;
-    } else {
-        if (cur->R == NULL) return NULL;
-        else return findSucc(cur->R, x);
-    }
-}
-```
 
 同样，我们来尝试找出 $$A$$ 班中名字的字典序「第二小」的。
 
