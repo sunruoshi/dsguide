@@ -176,7 +176,7 @@ while (cur->next && cur->next->name != "Bob") {
 ```cpp
 Node* tmp = cur->next;       // 先将指向 Bob 的指针保存下来 
 cur->next = cur->next->next; // 将 Alice 的指针域指向 Bob 的下一个人，即 Celine
-delete(tmp);                 // 删除 Bob
+delete tmp;                  // 删除 Bob
 ```
 
 为了方便起见，我们将打印整个链表的代码封装到一个函数 $$print()$$ 中，然后测试一下删除 $$Bob$$ 的效果：
@@ -220,7 +220,7 @@ int main() {
     // 删除 Bob
     Node* tmp = cur->next;
     cur->next = cur->next->next;
-    delete(tmp);
+    delete tmp;
     // 打印结果
     head->print();
     return 0;
@@ -303,7 +303,7 @@ int main() {
     }
     Node* tmp = cur->next;
     cur->next = cur->next->next;
-    delete(tmp);
+    delete tmp;
     // 把 Ford 插入到 Celine 和 David 之间
     cur = head->next;
     while (cur && cur->name != "Celine") {
@@ -390,7 +390,7 @@ while (cur->next && cur->next->name != "Bob") {
 Node *pre = cur->prev, *nex = cur->next;
 pre->next = nex;
 nex->prev = pre;
-delete(cur);
+delete cur;
 ```
 
 插入的情况也类似。下面来将新成员 $$Ford$$ 插入到 $$Celine$$ 和 $$David$$ 之间：
