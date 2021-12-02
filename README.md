@@ -19,6 +19,8 @@
 
 [Chapter IV - 二叉搜索树篇](Chapter\_4\_bst.md)
 
+[Chapter V：伸展树篇](Chapter\_5\_splay.md)
+
 [Extra I：二叉搜索树的一些有用的域](Extra\_1\.md)
 
 ## 0.3 参考资料
