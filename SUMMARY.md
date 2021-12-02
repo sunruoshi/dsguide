@@ -7,3 +7,4 @@
 * [Chapter IV：二叉搜索树篇](Chapter\_4\_bst.md)
 * [Chapter V：伸展树篇](Chapter\_5\_splay.md)
 * [Extra I：二叉搜索树的一些有用的域](Extra\_1\.md)
+* [Extra II：伸展树中的常用方法](Extra\_2\.md)
