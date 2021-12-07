@@ -270,7 +270,23 @@ Node* findSucc(Node* cur, string x) {
 }
 ```
 
-以上两种实现方式可以根据不同的应用场景灵活的选用。
+现在来试试找到 $$Andrew$$ 在树中的前驱和后继（$$Andrew$$ 在树中并不存在）：
+
+```cpp
+Node* pred = findPred(root, "Andrew");
+Node* succ = findSucc(root, "Andrew");
+cout << "Pred of Andrew: " << pred->name << endl;
+cout << "Succ of Andrew: " << succ->name << endl;
+```
+
+运行之后可以看到输出如下：
+
+```
+Pred of Andrew: Alice
+Succ of Andrew: Bob
+```
+
+以上两种实现方式需要根据不同的场景灵活的选用。
 
 下面测试一下，找到 $$A$$ 班学生中，名字的字典序「第二大」的。
 
