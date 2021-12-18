@@ -92,9 +92,10 @@ void deleteNode(Node* &cur, string x) {
 ```cpp
 int getRank(Node* cur, string x) {
     if (!cur->L && !cur->R) return 1;
+    int tmp = cur->L ? cur->L->size + 1 : 1;
     if (cur->L && x < cur->name) return getRank(cur->L, x);
-    if (cur->R && x > cur->name) return getRank(cur->R, x) + cur->L->size + 1;
-    return cur->L->size + 1;
+    if (cur->R && x > cur->name) return getRank(cur->R, x) + tmp;
+    return tmp;
 }
 ```
 
